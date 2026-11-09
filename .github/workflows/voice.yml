@@ -1,0 +1,29 @@
+name: Make voice line
+on:
+  push:
+    branches: [main]
+    paths: ['tools/voice/**', '.github/workflows/voice.yml']
+permissions:
+  contents: write
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -q piper-tts
+      - name: Speak
+        run: |
+          mkdir -p /tmp/out
+          for v in en_US-ryan-high en_US-lessac-high en_US-amy-medium en_US-joe-medium; do
+            lang=${v%%-*}; name=$(echo $v | cut -d- -f2); q=$(echo $v | cut -d- -f3)
+            base=https://huggingface.co/rhasspy/piper-voices/resolve/main/en/$lang/$name/$q/$v
+            curl -sL -o $v.onnx $base.onnx; curl -sL -o $v.onnx.json $base.onnx.json
+            piper -m $v.onnx -f /tmp/out/$v.wav < tools/voice/lines.txt || python -m piper -m $v.onnx -f /tmp/out/$v.wav < tools/voice/lines.txt
+          done
+          ls -la /tmp/out
+      - name: Save
+        run: |
+          git config user.name github-actions; git config user.email actions@github.com
+          git checkout --orphan media; git rm -rfq .; cp /tmp/out/*.wav .; git add *.wav; git commit -qm voice; git push -f origin media
