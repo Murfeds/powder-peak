@@ -1,5 +1,5 @@
 // Powder Peak service worker: plays offline from the saved copy; a new version installs in the background
-var V='pp-2466f83eb4';
+var V='pp-ee219e1e77';
 var FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable.png'];
 self.addEventListener('install',function(e){e.waitUntil(caches.open(V).then(function(c){return c.addAll(FILES);}));});
 self.addEventListener('message',function(e){if(e.data==='skip')self.skipWaiting();});

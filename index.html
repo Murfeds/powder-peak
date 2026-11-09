@@ -2214,6 +2214,8 @@ function funInit(){
   $('bRace').addEventListener('click',startRace);$('bShare').addEventListener('click',openShare);$('bFriends').addEventListener('click',openShare);
   $('shClose').addEventListener('click',closeShare);$('shGo').addEventListener('click',doShare);$('shAdd').addEventListener('click',addFriend);
   $('bTut').addEventListener('click',function(){toggleMenu();tutStart();});
+  // leaving the app (home button, phone call): pause the ride and stop the sound
+  document.addEventListener('visibilitychange',function(){if(document.hidden){if(AC)try{AC.suspend();}catch(e){}if(S.mode==='ride'&&$('menuO').hidden)toggleMenu();}else if(AC&&!S.muted)try{AC.resume();}catch(e){}});
   setBtnText();showDaily();
 }
 
